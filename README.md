@@ -7,7 +7,6 @@ It handles repository cloning, Docker installation, app deployment, and Nginx co
 
 ## Features
 
-- Parses command-line arguments with long options (`--option` style)
 - Verifies connectivity (ping + SSH)
 - Installs Docker and Nginx automatically
 - Builds and deploys the application using Docker or Docker Compose
@@ -21,32 +20,27 @@ It handles repository cloning, Docker installation, app deployment, and Nginx co
 
 ```bash
 chmod +x deploy.sh
-./deploy.sh --gurl <repo-url> \
-            --pat <github-pat> \
-            --username <server-username> \
-            --serverIP <server-ip> \
-            --file-path <path-to-ssh-key> \
-            --branch <branch-name> \
-            --port <app-port>
+./deploy.sh
 ```
 
 **Example:**
 
 ```bash
-./deploy.sh --gurl https://github.com/example/app.git \
-            --pat ghp_1234567890abcdef \
-            --username ubuntu \
-            --serverIP 192.168.1.10 \
-            --file-path ~/.ssh/id_rsa \
-            --branch main \
-            --port 8080
+
+Enter GitHub repo URL: <github_url>
+Enter GitHub Personal Access Token: github_pat_12...
+Enter remote server username: user1
+Enter remote server IP: <server_ip>
+Enter branch name (default: main):
+Enter path to SSH private key: <private_key_file>
+Enter app port: 8000
 ```
 
 ---
 
 ## Script Workflow
 
-1. **Argument Parsing** — Ensures all required flags are provided.
+1. **Input Passing** — Ensures all inputs are provided.
 2. **Repository Handling**
    - Clones repo if not present.
    - Pulls latest changes if already cloned.
