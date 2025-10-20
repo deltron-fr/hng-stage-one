@@ -6,56 +6,16 @@ LOGFILE="deploy_$(date +%Y%m%d_%H%M%S).log"
 exec > >(tee -a "$LOGFILE") 2>&1
 trap 'echo "Error on line $LINENO. Check $LOGFILE for details."; exit 1' ERR
 
-parse_args() {
-	while [[ $# -gt 0 ]]; do
-		case $1 in
-			--gurl)
-				url="$2"
-				shift 2
-				;;
-			--pat)
-				pat="$2"
-				shift 2
-				;;
-			--username)
-				username="$2"
-				shift 2
-				;;
-			--serverIP)
-				serverIP="$2"
-				shift 2
-				;;
-			--branch)
-				branch="$2"
-				shift 2
-				;;
-			--file-path)
-				ssh_key_path="$2"
-				shift 2
-				;;
-			--port)
-				port="$2"
-				shift 2
-				;;
-			-* | --*)
-			  	echo "unknown option: $1"
-				exit 1
-				;;
-		esac
-	done	       			       
-}
+read -p "Enter GitHub repo URL: " url
+read -p "Enter GitHub Personal Access Token: " pat
 
+read -p "Enter remote server username: " username
+read -p "Enter remote server IP: " serverIP
+read -p "Enter branch name (default: main): " branch
+branch=${branch:-main}
+read -p "Enter path to SSH private key: " ssh_key_path
+read -p "Enter app port: " port
 
-url=""
-pat=""
-username=""
-serverIP=""
-branch="main"
-ssh_key_path=""
-port=""
-github_user=""
-
-parse_args "$@"
 
 if [[ -z "$url" || -z "$pat" || -z "$username" || -z "$serverIP" || -z "$ssh_key_path" || -z "$port" ]]; then
 	echo "Missing required arguments."
@@ -70,7 +30,7 @@ fi
 repo_url=$(basename -s .git "$url")
 
 clone_repo() {
-	url_with_pat=$(echo "$url" | sed "s#https://#https://${pat}@#")
+	url_with_pat=$(echo "$url" | sed "s#https://#https://x-access-token:${pat}@#")
 
 	if [[ -d "$repo_url" ]]; then
 		echo "repository already exists. pulling changes..."
@@ -95,7 +55,6 @@ fi
 test_connectivity() {
 	echo "testing connectivity..."
 
-	ping -c 2 "$serverIP" >/dev/null || echo "Ping failed, continuing with SSH test..."
 	ssh -i "$ssh_key_path" "$username"@"$serverIP" "exit"
 
 }
@@ -112,7 +71,7 @@ remote_actions
 deploy_app() {
 	
 	cd ..
-	rsync -avz -e "ssh -i $ssh_key_path" "$repo_url" "$username@$serverIP:/home/$username"
+	rsync -avz -e "ssh -i $ssh_key_path" "$(pwd)/$repo_url" "$username@$serverIP:/home/$username"
 	if ! [[ -f "docker-compose.yaml" || -f "docker-compose.yml" ]]; then
 		ssh -i "$ssh_key_path" "$username"@"$serverIP" "docker ps -q | xargs -r docker stop"
 		ssh -i "$ssh_key_path" "$username"@"$serverIP" "cd $repo_url && docker build -t newimage:latest . && docker run -dp $port:$port newimage"
