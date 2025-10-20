@@ -5,7 +5,7 @@ It handles repository cloning, Docker installation, app deployment, and Nginx co
 
 ---
 
-## 📦 Features
+## Features
 
 - Parses command-line arguments with long options (`--option` style)
 - Verifies connectivity (ping + SSH)
@@ -17,7 +17,7 @@ It handles repository cloning, Docker installation, app deployment, and Nginx co
 
 ---
 
-## ⚙️ Usage
+## Usage
 
 ```bash
 chmod +x deploy.sh
@@ -44,7 +44,7 @@ chmod +x deploy.sh
 
 ---
 
-## 🧠 Script Workflow
+## Script Workflow
 
 1. **Argument Parsing** — Ensures all required flags are provided.
 2. **Repository Handling**
@@ -73,12 +73,12 @@ chmod +x deploy.sh
 
 ---
 
-## 🧾 Logging and Error Handling
+## Logging and Error Handling
 
 - All output is logged to `deploy_YYYYMMDD_HHMMSS.log`.
 ---
 
-## 🧹 Cleanup Command
+## Cleanup Command
 
 To completely remove the deployment (containers, repo, Nginx config):
 
@@ -88,7 +88,7 @@ To completely remove the deployment (containers, repo, Nginx config):
 
 ---
 
-## 🧱 Requirements
+## Requirements
 
 - Bash 4.0+
 - SSH access to the remote server
